@@ -1,0 +1,28 @@
+<section class="home">
+  <header class="home_header">
+    <div class="home_brand">
+      <img
+        class="home_logo"
+        src="/assets/images/logo.png"
+        alt="Logo Monádika Accesorios"
+      />
+      <h1 class="home_title">MONÁDIKA <span class="home_title_accs">Accesorios</span></h1>
+    </div>
+
+    <p class="home_subtitle">Catálogo</p>
+  </header>
+
+  <div class="categories-grid">
+    @for (category of categories; track category.slug) {
+      <a class="category-card" [routerLink]="['/categoria', category.slug]">
+        <img
+          class="category-card_image"
+          [src]="category.coverImage"
+          [alt]="category.name"
+          loading="lazy"
+        />
+        <span class="category-card_name">{{ category.name }}</span>
+      </a>
+    }
+  </div>
+</section>

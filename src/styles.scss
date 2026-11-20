@@ -1,1 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: #FEFCF4;
+  color: #2f382b;
+}
+
+@font-face {
+  font-family: 'LePetitCochon';
+  src: url('/assets/fonts/nf-le-petit-cochon-regular/Petit-cochon.ttf') format('truetype');
+  font-style: normal;
+  font-display: swap;
+}

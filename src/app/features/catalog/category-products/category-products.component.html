@@ -1,0 +1,64 @@
+<section class="category-page">
+    @if (viewModel$ | async; as vm) {
+    <header class="category-header">
+        <a class="category-back" routerLink="/">
+            <span class="material-symbols-outlined category-back_icon" aria-hidden="true">arrow_back</span>
+            <span>Volver al catálogo</span>
+        </a>
+        <h1 class="category-title">{{ vm.categoryName }}</h1>
+    </header>
+
+    @if (loading$ | async) {
+    <p class="category-status">Cargando piezas...</p>
+    } @else if (error$ | async) {
+    <p class="category-status is-error">{{ error$ | async }}</p>
+    } @else if (vm.products.length > 0 || vm.sizeFilter !== 'all') {
+    <div class="category-toolbar">
+        <div class="size-filter">
+            <span class="size-filter_label" id="size-filter-label">Filtrar por tamaño:</span>
+            <div class="size-chips" role="group" aria-labelledby="size-filter-label">
+                @for (chip of sizeChips; track chip.value) {
+                <button type="button" class="size-chip" [class.is-active]="vm.sizeFilter === chip.value"
+                    [attr.aria-pressed]="vm.sizeFilter === chip.value" (click)="onSizeSelect(chip.value)">
+                    {{ chip.label }}
+                </button>
+                }
+            </div>
+        </div>
+
+        <label class="sort-control">
+            <span class="sort-control_label">Ordenar:</span>
+            <select class="sort-control_select" [value]="vm.sort" (change)="onSortChange($event)">
+                <option value="name-asc">Nombre: A → Z</option>
+                <option value="name-desc">Nombre: Z → A</option>
+                <option value="price-asc">Precio: menor a mayor</option>
+                <option value="price-desc">Precio: mayor a menor</option>
+            </select>
+        </label>
+    </div>
+
+    @if (vm.products.length > 0) {
+    <div class="products-grid">
+        @for (product of vm.products; track product.id) {
+        <article class="product-card">
+            <img class="product-card_image" [src]="product.imageUrl" [alt]="product.name" loading="lazy" />
+            <div class="product-card_body">
+                <h2 class="product-card_name">{{ product.name }}</h2>
+                <span class="product-card_price">
+                    {{ product.price | currency:'ARS':'symbol-narrow':'1.0-0' }}
+                </span>
+                <button type="button" class="product-card_cta" (click)="askOnInstagram(product)">
+                    Consultar por Instagram
+                </button>
+            </div>
+        </article>
+        }
+    </div>
+    } @else {
+    <p class="category-status">No hay piezas de ese tamaño en esta categoría.</p>
+    }
+    } @else {
+    <p class="category-status">No hay productos disponibles en esta categoría.</p>
+    }
+    }
+</section>

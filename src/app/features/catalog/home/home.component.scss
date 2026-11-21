@@ -47,7 +47,7 @@
   object-fit: contain;
   flex-shrink: 0;
 
-  @media (min-width: 640px) {
+  @media (min-width: 767.98px) {
     height: clamp(7.5rem, 15vw, 10rem);
     max-width: 38vw;
   }
@@ -60,11 +60,14 @@
   text-align: center;
   overflow-wrap: anywhere;
   font-family: 'LePetitCochon', sans-serif;
+  @media (max-width: 767.98px) {
+    display: none;
+  }
 }
 
 .home_subtitle {
   margin: 0.35rem 0 0;
-  font-family: 'Alex Brush', cursive;
+  font-family: 'Almarai', sans-serif;
   font-size: clamp(5rem, 6.5vw, 7rem);
   line-height: 1.1;
   font-weight: 400;

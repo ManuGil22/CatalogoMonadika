@@ -1,6 +1,6 @@
 .category-page {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1440px; // aumentalo o poné `none` si querés que ocupe todo el ancho en monitores grandes
   margin: 0 auto;
   padding: 1.25rem 1rem 2.5rem;
   box-sizing: border-box;
@@ -64,16 +64,18 @@
 }
 
 .products-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
   gap: 0.9rem;
+  align-items: stretch;
 
   @media (min-width: 640px) {
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 1.25rem;
   }
 
   @media (min-width: 1024px) {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 1.5rem;
   }
 }
@@ -81,8 +83,7 @@
 .product-card {
   display: flex;
   flex-direction: column;
-  flex: 0 1 100%;
-  max-width: 22rem;
+  width: 100%;
   min-width: 0;
   background-color: #fff;
   border-radius: 12px;
@@ -93,19 +94,7 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 
   @media (min-width: 640px) {
-    flex: 0 1 calc((100% - 1.25rem) / 2);
-    max-width: calc((100% - 1.25rem) / 2);
     border-radius: 14px;
-  }
-
-  @media (min-width: 768px) {
-    flex: 0 1 calc((100% - (1.25rem * 2)) / 3);
-    max-width: calc((100% - (1.25rem * 2)) / 3);
-  }
-
-  @media (min-width: 1024px) {
-    flex: 0 1 calc((100% - (1.5rem * 3)) / 4);
-    max-width: calc((100% - (1.5rem * 3)) / 4);
   }
 
   &:active {
@@ -136,14 +125,15 @@
     padding: 0.75rem 0.75rem 1rem;
     text-align: center;
     flex: 1;
+    min-width: 0;
   }
 
   &_name {
     margin: 0;
-    font-size: clamp(1.1rem, 1.8vw, 1.3rem);
+    font-size: clamp(1.05rem, 1.8vw, 1.25rem);
     font-weight: 600;
     line-height: 1.25;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   &_price {
@@ -201,11 +191,14 @@
 
 .category-toolbar {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
   margin-bottom: 1.25rem;
 
-  @media (min-width: 640px) {
-    justify-content: flex-end;
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: space-between;
     margin-bottom: 1.5rem;
   }
 }
@@ -250,20 +243,6 @@
         box-shadow: 0 4px 12px rgba(72, 89, 66, 0.12);
       }
     }
-  }
-}
-
-.category-toolbar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.9rem;
-  margin-bottom: 1.25rem;
-
-  @media (min-width: 768px) {
-    flex-direction: row;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
   }
 }
 

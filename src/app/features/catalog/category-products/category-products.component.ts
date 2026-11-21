@@ -43,6 +43,7 @@ export class CategoryProductsComponent implements OnInit {
     ];
 
     readonly pageSizeOptions: readonly PageSizeOption[] = [10, 20, 50, 100];
+    readonly skeletonItems: readonly number[] = Array.from({ length: 8 }, (_, i) => i);
 
     readonly loading$ = this.catalogStore.loading$;
     readonly error$ = this.catalogStore.error$;

@@ -16,7 +16,7 @@
     <p class="category-status">Cargando piezas...</p>
     } @else if (error$ | async) {
     <p class="category-status is-error">{{ error$ | async }}</p>
-    } @else if (vm.products.length > 0 || vm.sizeFilter !== 'all') {
+    } @else if (vm.totalItems > 0 || vm.sizeFilter !== 'all') {
     <div class="category-toolbar">
         <div class="size-filter">
             <span class="size-filter_label" id="size-filter-label">Filtrar por tamaño:</span>
@@ -49,7 +49,7 @@
             <div class="product-card_body">
                 <h2 class="product-card_name">{{ product.name }}</h2>
                 <span class="product-card_price">
-                    {{ product.price | currency:'ARS':'$':'1.0-0' }}
+                    {{ product.price | currency:'ARS':'$':'1.0-0':'es-AR' }}
                 </span>
                 <a class="product-card_cta" [href]="getInstagramUrl(product)"
                     [attr.target]="isMobileViewport() ? '_self' : '_blank'" rel="noopener noreferrer"
@@ -60,6 +60,44 @@
         </article>
         }
     </div>
+
+    @if (vm.totalItems > 0) {
+    <nav class="pagination-bar" aria-label="Paginación de productos">
+        <div class="pagination-size">
+            <label class="pagination-size_label" for="page-size-select">Mostrar:</label>
+            <select id="page-size-select" class="sort-control_select" [value]="vm.pageSize"
+                (change)="onPageSizeChange($event)">
+                @for (option of pageSizeOptions; track option) {
+                <option [value]="option" [selected]="vm.pageSize === option">
+                    {{ option }} por página
+                </option>
+                }
+            </select>
+        </div>
+
+        <span class="pagination-info">
+            Mostrando {{ vm.startItem }}–{{ vm.endItem }} de {{ vm.totalItems }}
+        </span>
+
+        @if (vm.totalPages > 1) {
+        <div class="pagination-controls">
+            <button type="button" class="pagination-btn" [disabled]="vm.currentPage <= 1"
+                (click)="goToPage(vm.currentPage - 1, vm.totalPages)">
+                Anterior
+            </button>
+
+            <span class="pagination-page">
+                Página {{ vm.currentPage }} de {{ vm.totalPages }}
+            </span>
+
+            <button type="button" class="pagination-btn" [disabled]="vm.currentPage >= vm.totalPages"
+                (click)="goToPage(vm.currentPage + 1, vm.totalPages)">
+                Siguiente
+            </button>
+        </div>
+        }
+    </nav>
+    }
     } @else {
     <p class="category-status">No hay piezas de ese tamaño en esta categoría.</p>
     }

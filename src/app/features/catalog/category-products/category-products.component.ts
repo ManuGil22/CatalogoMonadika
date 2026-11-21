@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, switchMap } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, switchMap, tap } from 'rxjs';
 import { CatalogStore } from '../../../core/services/catalog-store.service';
 import { Product } from '../../../shared/product.model';
 import { environment } from '../../../../environments/environment';
@@ -10,9 +10,10 @@ export type SortOption =
     | 'name-asc'
     | 'name-desc'
     | 'price-asc'
-    | 'price-desc'
+    | 'price-desc';
 
 export type SizeFilter = 'all' | 'chico' | 'mediano' | 'grande';
+export type PageSizeOption = 10 | 20 | 50 | 100;
 
 interface SizeChip {
     value: SizeFilter;
@@ -31,6 +32,8 @@ export class CategoryProductsComponent implements OnInit {
     private readonly catalogStore = inject(CatalogStore);
     private readonly sortSubject = new BehaviorSubject<SortOption>('name-asc');
     private readonly sizeSubject = new BehaviorSubject<SizeFilter>('all');
+    private readonly pageSubject = new BehaviorSubject<number>(1);
+    private readonly pageSizeSubject = new BehaviorSubject<PageSizeOption>(20);
 
     readonly sizeChips: readonly SizeChip[] = [
         { value: 'all', label: 'Todos' },
@@ -39,28 +42,49 @@ export class CategoryProductsComponent implements OnInit {
         { value: 'grande', label: 'Grande' }
     ];
 
+    readonly pageSizeOptions: readonly PageSizeOption[] = [10, 20, 50, 100];
+
     readonly loading$ = this.catalogStore.loading$;
     readonly error$ = this.catalogStore.error$;
     readonly currentSort$ = this.sortSubject.asObservable();
     readonly currentSize$ = this.sizeSubject.asObservable();
+    readonly currentPage$ = this.pageSubject.asObservable();
+    readonly currentPageSize$ = this.pageSizeSubject.asObservable();
 
     readonly viewModel$ = this.route.paramMap.pipe(
         map((params) => params.get('slug') ?? ''),
+        tap(() => this.pageSubject.next(1)),
         switchMap((slug) =>
             combineLatest([
                 this.catalogStore.getCategoryNameBySlug(slug),
                 this.catalogStore.getProductsByCategorySlug(slug),
                 this.currentSort$,
-                this.currentSize$
+                this.currentSize$,
+                this.currentPage$,
+                this.currentPageSize$
             ]).pipe(
-                map(([categoryName, products, sort, sizeFilter]) => {
+                map(([categoryName, products, sort, sizeFilter, page, pageSize]) => {
                     const filteredBySize = this.filterBySize(products, sizeFilter);
+                    const sortedProducts = this.sortProducts(filteredBySize, sort);
+
+                    const totalItems = sortedProducts.length;
+                    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+                    const safePage = Math.min(Math.max(1, page), totalPages);
+                    const startIndex = (safePage - 1) * pageSize;
+                    const endIndex = Math.min(startIndex + pageSize, totalItems);
+
                     return {
                         slug,
                         categoryName,
                         sort,
                         sizeFilter,
-                        products: this.sortProducts(filteredBySize, sort)
+                        totalItems,
+                        pageSize,
+                        currentPage: safePage,
+                        totalPages,
+                        startItem: totalItems === 0 ? 0 : startIndex + 1,
+                        endItem: endIndex,
+                        products: sortedProducts.slice(startIndex, endIndex)
                     };
                 })
             )
@@ -74,10 +98,30 @@ export class CategoryProductsComponent implements OnInit {
     onSortChange(event: Event): void {
         const select = event.target as HTMLSelectElement;
         this.sortSubject.next(select.value as SortOption);
+        this.pageSubject.next(1);
     }
 
     onSizeSelect(size: SizeFilter): void {
         this.sizeSubject.next(size);
+        this.pageSubject.next(1);
+    }
+
+    onPageSizeChange(event: Event): void {
+        const select = event.target as HTMLSelectElement;
+        this.pageSizeSubject.next(Number(select.value) as PageSizeOption);
+        this.pageSubject.next(1);
+    }
+
+    goToPage(page: number, totalPages: number): void {
+        const nextPage = Math.min(Math.max(1, page), totalPages);
+        if (nextPage === this.pageSubject.value) {
+            return;
+        }
+
+        this.pageSubject.next(nextPage);
+        if (typeof window !== 'undefined') {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }
 
     getInstagramUrl(_product?: Product): string {

@@ -1,17 +1,39 @@
+$olive: #485942;
+$olive-soft: rgba($olive, 0.1);
+$olive-border: rgba($olive, 0.45);
+
+@mixin pressable($scale: 0.98) {
+  touch-action: manipulation;
+  &:active:not(:disabled) { transform: scale($scale); }
+}
+
+@mixin pill-btn($bg: $olive, $color: #fff) {
+  @include pressable(0.97);
+  appearance: none;
+  -webkit-appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1.5px solid $olive;
+  background-color: $bg;
+  color: $color;
+  font-family: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
 .category-page {
   width: 100%;
-  max-width: 1440px; // aumentalo o poné `none` si querés que ocupe todo el ancho en monitores grandes
+  max-width: 1440px;
   margin: 0 auto;
   padding: 1.25rem 1rem 2.5rem;
   box-sizing: border-box;
 
-  @media (min-width: 640px) {
-    padding: 2rem 1.5rem 3rem;
-  }
-
-  @media (min-width: 1024px) {
-    padding: 2.5rem 2rem 3.5rem;
-  }
+  @media (min-width: 640px) { padding: 2rem 1.5rem 3rem; }
+  @media (min-width: 1024px) { padding: 2.5rem 2rem 3.5rem; }
 }
 
 .category-header {
@@ -22,9 +44,7 @@
   gap: 0.5rem;
   margin-bottom: 1.5rem;
 
-  @media (min-width: 640px) {
-    margin-bottom: 2.25rem;
-  }
+  @media (min-width: 640px) { margin-bottom: 2.25rem; }
 }
 
 .category-back {
@@ -33,7 +53,7 @@
   align-items: center;
   gap: 0.35rem;
   text-decoration: none;
-  color: #485942;
+  color: $olive;
   font-weight: 600;
   font-size: 1.2rem;
   padding: 0.25rem 0;
@@ -48,10 +68,7 @@
   @media (hover: hover) {
     &:hover {
       opacity: 0.75;
-
-      .category-back_icon {
-        transform: translateX(-3px);
-      }
+      .category-back_icon { transform: translateX(-3px); }
     }
   }
 }
@@ -81,6 +98,7 @@
 }
 
 .product-card {
+  @include pressable;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -88,24 +106,17 @@
   background-color: #fff;
   border-radius: 12px;
   overflow: hidden;
-  border: 1.5px solid rgba(72, 89, 66, 0.45);
+  border: 1.5px solid $olive-border;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  touch-action: manipulation;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 
-  @media (min-width: 640px) {
-    border-radius: 14px;
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
+  @media (min-width: 640px) { border-radius: 14px; }
 
   @media (hover: hover) {
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 10px 24px rgba(72, 89, 66, 0.14);
-      border-color: #485942;
+      box-shadow: 0 10px 24px rgba($olive, 0.14);
+      border-color: $olive;
     }
   }
 
@@ -139,10 +150,11 @@
   &_price {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #485942;
+    color: $olive;
   }
 
   &_cta {
+    @include pressable;
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
@@ -151,8 +163,8 @@
     width: 100%;
     padding: 0.6rem 0.85rem;
     border-radius: 8px;
-    border: 1.5px solid #485942;
-    background-color: #485942;
+    border: 1.5px solid $olive;
+    background-color: $olive;
     color: #fff;
     text-decoration: none;
     font-family: inherit;
@@ -161,17 +173,12 @@
     line-height: 1.2;
     text-align: center;
     cursor: pointer;
-    touch-action: manipulation;
     transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
-
-    &:active {
-      transform: scale(0.98);
-    }
 
     @media (hover: hover) {
       &:hover {
         background-color: transparent;
-        color: #485942;
+        color: $olive;
       }
     }
   }
@@ -213,7 +220,7 @@
   &_label {
     font-size: 0.98rem;
     font-weight: 600;
-    color: #485942;
+    color: $olive;
   }
 
   &_select {
@@ -221,13 +228,13 @@
     -webkit-appearance: none;
     background-color: #fff;
     color: #222;
-    border: 1.5px solid #485942;
+    border: 1.5px solid $olive;
     border-radius: 10px;
     padding: 0.55rem 2.25rem 0.55rem 0.85rem;
     font-size: 0.95rem;
     font-weight: 500;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(72, 89, 66, 0.06);
+    box-shadow: 0 2px 6px rgba($olive, 0.06);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23485942' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.65rem center;
@@ -235,13 +242,11 @@
 
     &:focus {
       outline: none;
-      box-shadow: 0 0 0 3px rgba(72, 89, 66, 0.18);
+      box-shadow: 0 0 0 3px rgba($olive, 0.18);
     }
 
     @media (hover: hover) {
-      &:hover {
-        box-shadow: 0 4px 12px rgba(72, 89, 66, 0.12);
-      }
+      &:hover { box-shadow: 0 4px 12px rgba($olive, 0.12); }
     }
   }
 }
@@ -263,7 +268,7 @@
   &_label {
     font-size: 0.98rem;
     font-weight: 600;
-    color: #485942;
+    color: $olive;
   }
 }
 
@@ -276,9 +281,7 @@
   overflow-x: auto;
   scrollbar-width: none;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
+  &::-webkit-scrollbar { display: none; }
 
   @media (min-width: 640px) {
     flex-wrap: wrap;
@@ -288,43 +291,120 @@
 }
 
 .size-chip {
+  @include pill-btn(transparent, $olive);
   flex-shrink: 0;
   padding: 0.4rem 0.65rem;
-  border-radius: 999px;
-  border: 1.5px solid #485942;
-  background-color: transparent;
-  color: #485942;
   font-size: 0.84rem;
-  font-weight: 600;
-  line-height: 1.2;
-  cursor: pointer;
-  touch-action: manipulation;
-  transition: background-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
 
   @media (min-width: 640px) {
     padding: 0.45rem 0.95rem;
     font-size: 0.92rem;
   }
 
-  &:active {
-    transform: scale(0.97);
-  }
-
   @media (hover: hover) {
-    &:hover {
-      background-color: rgba(72, 89, 66, 0.1);
-    }
+    &:hover { background-color: $olive-soft; }
   }
 
   &.is-active {
-    background-color: #485942;
+    background-color: $olive;
     color: #fff;
 
     @media (hover: hover) {
       &:hover {
-        background-color: #485942;
+        background-color: $olive;
         color: #fff;
       }
     }
+  }
+}
+
+.pagination-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2.25rem;
+  padding: 1rem 1.25rem;
+  background-color: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba($olive, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba($olive, 0.05);
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    padding: 0.9rem 1.35rem;
+  }
+}
+
+.pagination-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  &_label {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: $olive;
+    white-space: nowrap;
+  }
+
+  .sort-control_select {
+    padding: 0.45rem 2.1rem 0.45rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    background-color: #fff;
+  }
+}
+
+.pagination-info {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: $olive;
+  opacity: 0.85;
+  text-align: center;
+}
+
+.pagination-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-page {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: $olive;
+  padding: 0 0.25rem;
+  white-space: nowrap;
+}
+
+.pagination-btn {
+  @include pill-btn;
+  padding: 0.5rem 1rem;
+  font-size: 0.88rem;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: transparent;
+      color: $olive;
+      box-shadow: 0 4px 10px rgba($olive, 0.12);
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($olive, 0.22);
+  }
+
+  &:disabled {
+    background-color: rgba($olive, 0.08);
+    border-color: rgba($olive, 0.22);
+    color: $olive-border;
+    cursor: not-allowed;
+    box-shadow: none;
   }
 }

@@ -2,7 +2,11 @@
     @if (viewModel$ | async; as vm) {
     <header class="category-header">
         <a class="category-back" routerLink="/">
-            <span class="material-symbols-outlined category-back_icon" aria-hidden="true">arrow_back</span>
+            <svg class="category-back_icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5" />
+                <path d="M12 19l-7-7 7-7" />
+            </svg>
             <span>Volver al catálogo</span>
         </a>
         <h1 class="category-title">{{ vm.categoryName }}</h1>
@@ -47,9 +51,11 @@
                 <span class="product-card_price">
                     {{ product.price | currency:'ARS':'symbol-narrow':'1.0-0' }}
                 </span>
-                <button type="button" class="product-card_cta" (click)="askOnInstagram(product)">
+                <a class="product-card_cta" [href]="getInstagramUrl(product)"
+                    [attr.target]="isMobileViewport() ? '_self' : '_blank'" rel="noopener noreferrer"
+                    (click)="askOnInstagram(product, $event)">
                     Consultar por Instagram
-                </button>
+                </a>
             </div>
         </article>
         }

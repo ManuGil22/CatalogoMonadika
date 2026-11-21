@@ -80,18 +80,27 @@ export class CategoryProductsComponent implements OnInit {
         this.sizeSubject.next(size);
     }
 
-    askOnInstagram(_product: Product): void {
+    getInstagramUrl(_product?: Product): string {
         const instagramUsername = environment.instagramUsername?.replace(/^@/, '').trim();
         if (!instagramUsername) {
+            return '';
+        }
+
+        return `https://ig.me/m/${instagramUsername}`;
+    }
+
+    isMobileViewport(): boolean {
+        return typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+    }
+
+    askOnInstagram(product: Product, event?: Event): void {
+        const url = this.getInstagramUrl(product);
+        if (!url) {
             return;
         }
 
-        const url = `https://ig.me/m/${instagramUsername}`;
-        const isMobile = typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
-
-        if (isMobile) {
-            window.location.assign(url);
-        } else {
+        if (!this.isMobileViewport()) {
+            event?.preventDefault();
             window.open(url, '_blank', 'noopener,noreferrer');
         }
     }

@@ -102,7 +102,24 @@ export class CategoryProductsComponent implements OnInit {
         if (!this.isMobileViewport()) {
             event?.preventDefault();
             window.open(url, '_blank', 'noopener,noreferrer');
+            return;
         }
+
+        const username = environment.instagramUsername?.replace(/^@/, '').trim();
+        if (!username) {
+            return;
+        }
+
+        const profileUrl = `https://www.instagram.com/${username}/`;
+        const fallbackTimer = window.setTimeout(() => {
+            if (!document.hidden) {
+                window.location.replace(profileUrl);
+            }
+        }, 1800);
+
+        const clearFallback = () => window.clearTimeout(fallbackTimer);
+        document.addEventListener('visibilitychange', clearFallback, { once: true });
+        window.addEventListener('pagehide', clearFallback, { once: true });
     }
 
     private filterBySize(products: Product[], sizeFilter: SizeFilter): Product[] {

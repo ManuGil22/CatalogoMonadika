@@ -49,7 +49,7 @@
             <div class="product-card_body">
                 <h2 class="product-card_name">{{ product.name }}</h2>
                 <span class="product-card_price">
-                    {{ product.price | currency:'ARS':'symbol-narrow':'1.0-0' }}
+                    {{ product.price | currency:'ARS':'$':'1.0-0' }}
                 </span>
                 <a class="product-card_cta" [href]="getInstagramUrl(product)"
                     [attr.target]="isMobileViewport() ? '_self' : '_blank'" rel="noopener noreferrer"

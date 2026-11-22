@@ -12,6 +12,11 @@ export const CATEGORY_CARDS: CategoryCard[] = [
         coverImage: 'assets/images/categories/aro-colgante.jpg'
     },
     {
+        name: 'Charms',
+        slug: 'charms',
+        coverImage: 'assets/images/categories/charms.png'
+    },
+    {
         name: 'Argollas',
         slug: 'argollas',
         coverImage: 'assets/images/categories/argollas.jpg'

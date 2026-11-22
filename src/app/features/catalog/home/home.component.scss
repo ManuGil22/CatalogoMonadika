@@ -73,6 +73,9 @@
   font-weight: 400;
   letter-spacing: 0.02em;
   opacity: 0.88;
+  @media (max-width: 767.98px) {
+    font-size: clamp(2.2rem, 4vw, 4rem);;
+  }
 }
 
 .categories-grid {

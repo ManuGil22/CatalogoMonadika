@@ -13,22 +13,12 @@
     </header>
 
     @if (loading$ | async) {
-    <div class="products-grid" aria-busy="true" aria-label="Cargando piezas">
-        @for (item of skeletonItems; track item) {
-        <article class="product-card is-skeleton" aria-hidden="true">
-            <div class="product-card_image skeleton-block"></div>
-            <div class="product-card_body skeleton-body">
-                <span class="skeleton-block skeleton-line skeleton-line--title"></span>
-                <span class="skeleton-block skeleton-line skeleton-line--price"></span>
-                <span class="skeleton-block skeleton-btn"></span>
-            </div>
-        </article>
-        }
-    </div>
+    <p class="category-status">Cargando piezas...</p>
     } @else if (error$ | async) {
     <p class="category-status is-error">{{ error$ | async }}</p>
-    } @else if (vm.totalItems > 0 || vm.sizeFilter !== 'all') {
+    } @else if (vm.totalItems > 0 || (!vm.hideSizeFilter && vm.sizeFilter !== 'all')) {
     <div class="category-toolbar">
+        @if (!vm.hideSizeFilter) {
         <div class="size-filter">
             <span class="size-filter_label" id="size-filter-label">Filtrar por tamaño:</span>
             <div class="size-chips" role="group" aria-labelledby="size-filter-label">
@@ -40,6 +30,7 @@
                 }
             </div>
         </div>
+        }
 
         <label class="sort-control">
             <span class="sort-control_label">Ordenar:</span>

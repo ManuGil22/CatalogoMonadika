@@ -10,5 +10,10 @@ export const CATEGORY_CARDS: CategoryCard[] = [
         name: 'Aros colgantes',
         slug: 'aros-colgantes',
         coverImage: 'assets/images/categories/aro-colgante.jpg'
+    },
+    {
+        name: 'Argollas',
+        slug: 'argollas',
+        coverImage: 'assets/images/categories/argollas.jpg'
     }
 ];

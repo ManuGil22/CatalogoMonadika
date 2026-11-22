@@ -59,7 +59,7 @@ export class CatalogStore {
                 products.filter(
                     (product) =>
                         this.toSlug(product.category) === normalizedSlug ||
-                        this.toSlug(product.size) === normalizedSlug
+                        this.toSlug(product.size ?? '') === normalizedSlug
                 )
             )
         );
@@ -94,13 +94,17 @@ export class CatalogStore {
         const hasValidStrings =
             typeof product.name === 'string' && product.name.trim().length > 0 &&
             typeof product.category === 'string' && product.category.trim().length > 0 &&
-            typeof product.size === 'string' && product.size.trim().length > 0 &&
             typeof product.imageUrl === 'string' && product.imageUrl.trim().length > 0;
+
+        const hasValidSize =
+            product.size === undefined ||
+            product.size === null ||
+            typeof product.size === 'string';
 
         const numericPrice = Number(product.price);
         const hasValidPrice = Number.isFinite(numericPrice) && numericPrice > 0;
 
-        return hasValidStrings && hasValidPrice;
+        return hasValidStrings && hasValidSize && hasValidPrice;
     }
 
     private buildCategoryCards(products: Product[]): CategoryCard[] {
@@ -108,7 +112,9 @@ export class CatalogStore {
 
         for (const product of products) {
             const image = product.imageUrl.trim();
-            const candidateNames = [product.category.trim(), product.size.trim()];
+            const candidateNames = [product.category?.trim(), product.size?.trim()].filter(
+                (name): name is string => Boolean(name)
+            );
 
             for (const cleanName of candidateNames) {
                 const slug = this.toSlug(cleanName);

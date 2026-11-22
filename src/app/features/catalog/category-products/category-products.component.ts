@@ -34,6 +34,7 @@ export class CategoryProductsComponent implements OnInit {
     private readonly sizeSubject = new BehaviorSubject<SizeFilter>('all');
     private readonly pageSubject = new BehaviorSubject<number>(1);
     private readonly pageSizeSubject = new BehaviorSubject<PageSizeOption>(20);
+    private readonly categoriesWithoutSizeFilter = new Set<string>(['argollas']);
 
     readonly sizeChips: readonly SizeChip[] = [
         { value: 'all', label: 'Todos' },
@@ -54,7 +55,10 @@ export class CategoryProductsComponent implements OnInit {
 
     readonly viewModel$ = this.route.paramMap.pipe(
         map((params) => params.get('slug') ?? ''),
-        tap(() => this.pageSubject.next(1)),
+        tap(() => {
+            this.pageSubject.next(1);
+            this.sizeSubject.next('all');
+        }),
         switchMap((slug) =>
             combineLatest([
                 this.catalogStore.getCategoryNameBySlug(slug),
@@ -65,7 +69,14 @@ export class CategoryProductsComponent implements OnInit {
                 this.currentPageSize$
             ]).pipe(
                 map(([categoryName, products, sort, sizeFilter, page, pageSize]) => {
-                    const filteredBySize = this.filterBySize(products, sizeFilter);
+                    const normalizedSlug = this.normalizeText(slug);
+                    const normalizedCat = this.normalizeText(categoryName);
+                    const hideSizeFilter =
+                        this.categoriesWithoutSizeFilter.has(normalizedSlug) ||
+                        this.categoriesWithoutSizeFilter.has(normalizedCat);
+
+                    const effectiveSizeFilter: SizeFilter = hideSizeFilter ? 'all' : sizeFilter;
+                    const filteredBySize = this.filterBySize(products, effectiveSizeFilter);
                     const sortedProducts = this.sortProducts(filteredBySize, sort);
 
                     const totalItems = sortedProducts.length;
@@ -77,8 +88,9 @@ export class CategoryProductsComponent implements OnInit {
                     return {
                         slug,
                         categoryName,
+                        hideSizeFilter,
                         sort,
-                        sizeFilter,
+                        sizeFilter: effectiveSizeFilter,
                         totalItems,
                         pageSize,
                         currentPage: safePage,

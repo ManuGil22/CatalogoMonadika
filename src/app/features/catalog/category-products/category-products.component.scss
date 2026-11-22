@@ -249,6 +249,10 @@ $olive-border: rgba($olive, 0.45);
       &:hover { box-shadow: 0 4px 12px rgba($olive, 0.12); }
     }
   }
+  
+  @media (min-width: 768px) {
+    margin-left: auto;
+  }
 }
 
 .size-filter {

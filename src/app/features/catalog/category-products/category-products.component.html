@@ -10,6 +10,22 @@
             <span>Volver al catálogo</span>
         </a>
         <h1 class="category-title">{{ vm.categoryName }}</h1>
+        @if (isCharmsCategory(vm.slug, vm.categoryName)) {
+        <aside class="category-notice" role="note" aria-label="Información sobre argollas">
+            <svg class="category-notice_icon" viewBox="0 0 24 24" width="22" height="22" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="16" x2="12" y2="12" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+            <p class="category-notice_text">
+                <strong>Importante:</strong> las argollas no están incluidas en el precio de los charms y se venden
+                por separado. Podés elegir la tuya en la sección
+                <a class="category-notice_link" routerLink="/categoria/argollas">Argollas</a>.
+            </p>
+        </aside>
+        }
     </header>
 
     @if (loading$ | async) {

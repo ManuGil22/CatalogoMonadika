@@ -178,6 +178,13 @@ export class CategoryProductsComponent implements OnInit {
         document.addEventListener('visibilitychange', clearFallback, { once: true });
         window.addEventListener('pagehide', clearFallback, { once: true });
     }
+    
+    isCharmsCategory(slug: string, categoryName: string): boolean {
+        return (
+            this.normalizeText(slug) === 'charms' ||
+            this.normalizeText(categoryName) === 'charms'
+        );
+    }
 
     private filterBySize(products: Product[], sizeFilter: SizeFilter): Product[] {
         if (sizeFilter === 'all') {

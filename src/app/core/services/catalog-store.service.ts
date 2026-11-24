@@ -39,9 +39,12 @@ export class CatalogStore {
             )
             .subscribe({
                 next: (products) => {
-                    const validProducts = (products ?? []).filter(
-                        (item) => this.isValidProduct(item) && item.available !== false
-                    );
+                    const validProducts = (products ?? [])
+                        .filter((item) => this.isValidProduct(item) && item.available !== false)
+                        .map((item) => ({
+                            ...item,
+                            imageUrl: this.normalizeImageUrl(item.imageUrl)
+                        }));
                     this.productsSubject.next(validProducts);
                     this.hasLoaded = true;
                 },
@@ -84,6 +87,19 @@ export class CatalogStore {
             .replace(/[\u0300-\u036f]/g, '')
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/^-+|-+$/g, '');
+    }
+
+    private normalizeImageUrl(rawUrl: string): string {
+        const cleanUrl = (rawUrl ?? '').trim();
+        const driveMatch = cleanUrl.match(
+            /drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=view&)?id=)([a-zA-Z0-9_-]+)/
+        );
+
+        if (driveMatch?.[1]) {
+            return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w1000`;
+        }
+
+        return cleanUrl;
     }
 
     private isValidProduct(product: Product | null | undefined): product is Product {

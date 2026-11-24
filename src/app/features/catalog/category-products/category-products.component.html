@@ -74,7 +74,11 @@
     <div class="products-grid">
         @for (product of vm.products; track product.id) {
         <article class="product-card">
-            <img class="product-card_image" [src]="product.imageUrl" [alt]="product.name" loading="lazy" />
+            <button type="button" class="product-card_image-btn" (click)="openLightbox(product)"
+                [attr.aria-label]="'Ampliar imagen de ' + product.name">
+                <img class="product-card_image" [src]="product.imageUrl" [alt]="product.name" loading="lazy"
+                    (error)="onImageError($event, product)" />
+            </button>
             <div class="product-card_body">
                 <h2 class="product-card_name">{{ product.name }}</h2>
                 <span class="product-card_price">
@@ -133,5 +137,34 @@
     } @else {
     <p class="category-status">No hay productos disponibles en esta categoría.</p>
     }
+    }
+
+    @if (lightboxProduct; as item) {
+    <div class="lightbox" role="dialog" aria-modal="true" [attr.aria-label]="'Vista ampliada de ' + item.name"
+        (click)="closeLightbox()">
+        <div class="lightbox_top" (click)="$event.stopPropagation()">
+            <span class="lightbox_title">{{ item.name }}</span>
+            <div class="lightbox_zoom-controls">
+                <button type="button" class="lightbox_btn" (click)="zoomOut()" [disabled]="zoomLevel <= 1"
+                    aria-label="Alejar zoom">−</button>
+                <button type="button" class="lightbox_btn lightbox_btn--label" (click)="resetZoom()"
+                    aria-label="Restablecer zoom">
+                    {{ (zoomLevel * 100) | number:'1.0-0' }}%
+                </button>
+                <button type="button" class="lightbox_btn" (click)="zoomIn()" [disabled]="zoomLevel >= 2.5"
+                    aria-label="Acercar zoom">+</button>
+                <button type="button" class="lightbox_btn lightbox_btn--close" (click)="closeLightbox()"
+                    aria-label="Cerrar visualizador">✕</button>
+            </div>
+        </div>
+
+        <div class="lightbox_stage" (click)="closeLightbox()">
+            <img class="lightbox_image" [class.is-zoomed]="zoomLevel > 1" [src]="item.imageUrl" [alt]="item.name"
+                [style.transform]="'translate(' + panX + 'px, ' + panY + 'px) scale(' + zoomLevel + ')'"
+                (click)="toggleZoomOnImage($event)" (pointerdown)="onImagePointerDown($event)"
+                (pointermove)="onImagePointerMove($event)" (pointerup)="onImagePointerUp($event)"
+                (pointercancel)="onImagePointerUp($event)" (error)="onImageError($event, item)" />
+        </div>
+    </div>
     }
 </section>

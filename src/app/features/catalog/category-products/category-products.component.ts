@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, HostListener, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BehaviorSubject, combineLatest, map, switchMap, tap } from 'rxjs';
@@ -35,6 +35,16 @@ export class CategoryProductsComponent implements OnInit {
     private readonly pageSubject = new BehaviorSubject<number>(1);
     private readonly pageSizeSubject = new BehaviorSubject<PageSizeOption>(20);
     private readonly categoriesWithoutSizeFilter = new Set<string>(['argollas']);
+    private readonly zoomSteps = [1, 1.75, 2.5] as const;
+
+    private isDragging = false;
+    private dragStartX = 0;
+    private dragStartY = 0;
+
+    lightboxProduct: Product | null = null;
+    zoomLevel = 1;
+    panX = 0;
+    panY = 0;
 
     readonly sizeChips: readonly SizeChip[] = [
         { value: 'all', label: 'Todos' },
@@ -108,6 +118,108 @@ export class CategoryProductsComponent implements OnInit {
         this.catalogStore.loadProducts();
     }
 
+    @HostListener('document:keydown.escape')
+    onEscapeKey(): void {
+        if (this.lightboxProduct) {
+            this.closeLightbox();
+        }
+    }
+
+    openLightbox(product: Product): void {
+        this.lightboxProduct = product;
+        this.resetZoom();
+    }
+
+    closeLightbox(): void {
+        this.lightboxProduct = null;
+        this.isDragging = false;
+        this.resetZoom();
+    }
+
+    resetZoom(): void {
+        this.zoomLevel = 1;
+        this.panX = 0;
+        this.panY = 0;
+    }
+
+    zoomIn(): void {
+        const next = this.zoomSteps.find((step) => step > this.zoomLevel + 0.01);
+        if (next) {
+            this.zoomLevel = next;
+        }
+    }
+
+    zoomOut(): void {
+        const prev = [...this.zoomSteps].reverse().find((step) => step < this.zoomLevel - 0.01);
+        this.zoomLevel = prev ?? 1;
+        if (this.zoomLevel === 1) {
+            this.panX = 0;
+            this.panY = 0;
+        }
+    }
+
+    toggleZoomOnImage(event: MouseEvent): void {
+        event.stopPropagation();
+        if (this.isDragging) {
+            return;
+        }
+
+        if (this.zoomLevel > 1) {
+            this.resetZoom();
+        } else {
+            this.zoomLevel = 2;
+        }
+    }
+
+    onImagePointerDown(event: PointerEvent): void {
+        if (this.zoomLevel <= 1) {
+            return;
+        }
+
+        this.isDragging = true;
+        this.dragStartX = event.clientX - this.panX;
+        this.dragStartY = event.clientY - this.panY;
+        (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    }
+
+    onImagePointerMove(event: PointerEvent): void {
+        if (!this.isDragging || this.zoomLevel <= 1) {
+            return;
+        }
+
+        const maxPan = (this.zoomLevel - 1) * 140;
+        this.panX = Math.min(maxPan, Math.max(-maxPan, event.clientX - this.dragStartX));
+        this.panY = Math.min(maxPan, Math.max(-maxPan, event.clientY - this.dragStartY));
+    }
+
+    onImagePointerUp(event: PointerEvent): void {
+        if (!this.isDragging) {
+            return;
+        }
+
+        this.isDragging = false;
+        if ((event.currentTarget as HTMLElement).hasPointerCapture(event.pointerId)) {
+            (event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId);
+        }
+    }
+
+    onImageError(event: Event, product: Product): void {
+        const img = event.target as HTMLImageElement;
+        if (!img || img.dataset['fallbackApplied'] === 'true') {
+            return;
+        }
+
+        img.dataset['fallbackApplied'] = 'true';
+        const driveIdMatch = (product.imageUrl ?? '').match(/\/d\/([a-zA-Z0-9_-]+)/);
+
+        if (driveIdMatch?.[1] && !img.src.includes('drive.google.com/thumbnail')) {
+            img.src = `https://drive.google.com/thumbnail?id=${driveIdMatch[1]}&sz=w800`;
+            return;
+        }
+
+        img.src = 'assets/placeholder-product.png';
+    }
+
     onSortChange(event: Event): void {
         const select = event.target as HTMLSelectElement;
         this.sortSubject.next(select.value as SortOption);
@@ -178,7 +290,7 @@ export class CategoryProductsComponent implements OnInit {
         document.addEventListener('visibilitychange', clearFallback, { once: true });
         window.addEventListener('pagehide', clearFallback, { once: true });
     }
-    
+
     isCharmsCategory(slug: string, categoryName: string): boolean {
         return (
             this.normalizeText(slug) === 'charms' ||

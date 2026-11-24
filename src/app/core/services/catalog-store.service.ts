@@ -43,7 +43,7 @@ export class CatalogStore {
                         .filter((item) => this.isValidProduct(item) && item.available !== false)
                         .map((item) => ({
                             ...item,
-                            imageUrl: this.normalizeImageUrl(item.imageUrl)
+                            imageUrl: this.normalizeImageUrl(item.imageUrl, item.category)
                         }));
                     this.productsSubject.next(validProducts);
                     this.hasLoaded = true;
@@ -89,17 +89,36 @@ export class CatalogStore {
             .replace(/^-+|-+$/g, '');
     }
 
-    private normalizeImageUrl(rawUrl: string): string {
+    private normalizeImageUrl(rawUrl: string, category?: string): string {
         const cleanUrl = (rawUrl ?? '').trim();
-        const driveMatch = cleanUrl.match(
-            /drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=view&)?id=)([a-zA-Z0-9_-]+)/
-        );
-
-        if (driveMatch?.[1]) {
-            return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w1000`;
+        if (!cleanUrl) {
+            return '';
         }
 
-        return cleanUrl;
+        if (/^https?:\/\//i.test(cleanUrl)) {
+            const driveMatch = cleanUrl.match(
+                /drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=view&)?id=)([a-zA-Z0-9_-]+)/
+            );
+
+            if (driveMatch?.[1]) {
+                return `https://lh3.googleusercontent.com/d/${driveMatch[1]}=w1000`;
+            }
+
+            return cleanUrl;
+        }
+
+        if (cleanUrl.startsWith('assets/') || cleanUrl.startsWith('/')) {
+            return cleanUrl;
+        }
+
+        const cleanFileName = cleanUrl.replace(/^\/+/, '');
+        const hasExtension = /\.[a-z0-9]{2,5}$/i.test(cleanFileName);
+        const fileName = hasExtension ? cleanFileName : `${cleanFileName}.jpg`;
+        const categoryFolder = this.toSlug(category ?? '');
+
+        return categoryFolder
+            ? `assets/images/catalog/${categoryFolder}/${fileName}`
+            : `assets/images/catalog/${fileName}`;
     }
 
     private isValidProduct(product: Product | null | undefined): product is Product {
